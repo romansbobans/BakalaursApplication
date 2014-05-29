@@ -5,14 +5,14 @@ package com.romans.visitsmart.networking.traffic;
  */
 public class Response<T> {
 
-    String responseMessage;
+    String errorMessage;
     ResponseCode code;
     T object;
 
-
-
-    public Response(ResponseCode ok, T response, String errorMessage) {
-
+    public Response(String errorMessage, ResponseCode code, T object) {
+        this.errorMessage = errorMessage;
+        this.code = code;
+        this.object = object;
     }
 
     public T getReturnObject() {

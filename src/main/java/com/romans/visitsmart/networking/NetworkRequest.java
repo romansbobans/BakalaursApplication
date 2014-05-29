@@ -1,16 +1,24 @@
 package com.romans.visitsmart.networking;
 
 import android.os.AsyncTask;
+import android.util.Log;
+import com.google.gson.Gson;
 import com.romans.visitsmart.networking.handler.NetworkHandler;
 import com.romans.visitsmart.networking.traffic.Response;
 import com.romans.visitsmart.networking.traffic.ResponseCode;
 import com.romans.visitsmart.networking.traffic.Type;
+import com.romans.visitsmart.utils.DevLog;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.UnknownHostException;
@@ -18,18 +26,27 @@ import java.net.UnknownHostException;
 /**
  * Created by Romans on 01/04/14.
  */
-public class NetworkRequest<T> {
+class NetworkRequest {
 
-    private static final String BASE_URL = "AS";
+    private static final String BASE_URL = "http://lginvest.lv/";
+    private static final int PORT_NR = 9000;
     private final String callbackMethod;
     private final AsyncTask task;
     private final NetworkHandler handler;
     private final String link;
+    private final String message;
 
-    public NetworkRequest(NetworkHandler handler, String link, String callbackMethod, Type type) {
+    private Class returningClass;
+
+    private NetworkRequest(NetworkHandler handler, String link, String callbackMethod, Type type, Class returnVal) {
+        this(handler, link, null, callbackMethod, type, returnVal);
+    }
+
+    private NetworkRequest(NetworkHandler handler, String link, String postMessage, String callbackMethod, Type type, Class returnVal) {
         this.handler = handler;
         this.link = link;
         this.callbackMethod = callbackMethod;
+        this.message = postMessage;
 
         switch (type)
         {
@@ -43,46 +60,98 @@ public class NetworkRequest<T> {
                 task = null;
                 assert (false) : "Shouldn't happen, check your enum constants " + type;
         }
+
+        returningClass = returnVal;
     }
 
-    public static <T> NetworkRequest createGetRequest(NetworkHandler handler, String link, String callbackMethod) {
-        return new NetworkRequest<T>(handler, link, callbackMethod, Type.GET);
+    public static NetworkRequest createGetRequest(NetworkHandler handler, String link, String callbackMethod, Class returnVal) {
+
+        return new NetworkRequest(handler, link, callbackMethod, Type.GET, returnVal);
     }
 
+    public static NetworkRequest createPostRequest(NetworkHandler handler, String link, String postMessage, String callbackMethod, Class returnVal) {
+
+        return new NetworkRequest(handler, link, postMessage, callbackMethod, Type.POST, returnVal);
+    }
 
     public void execute() {
         task.execute();
     }
 
-    private class GetTask extends AsyncTask<Void, Void, Response> {
+
+    private class GetTask extends AsyncTask<Object, Void, Response> {
         @Override
-        protected Response doInBackground(Void... params) {
+        protected Response doInBackground(Object... params) {
             try
             {
-                DefaultHttpClient client = new DefaultHttpClient();
+                HttpClient c = new DefaultHttpClient();
+
+
                 HttpGet get = new HttpGet(BASE_URL + link);
-                HttpResponse response = client.execute(get);
+                HttpResponse response = c.execute(get);
+
                 String responseString = getResponse(response.getEntity().getContent());
-                return new Response(ResponseCode.OK, responseString, null);
+                Log.e("TAAG", responseString);
+                Object returnVal = new Gson().fromJson(responseString, returningClass);
+                return new Response(null, ResponseCode.OK, returnVal);// new Response(ResponseCode.OK, responseString, null);
             }
             catch (UnknownHostException e)
             {
-                return new Response(ResponseCode.UNKNOWN_HOST, null, "Unable to connect to network");
+                e.printStackTrace();
+                return new Response(null, ResponseCode.NO_NETWORK, null);//new Response(ResponseCode.UNKNOWN_HOST, null, "Unable to connect to network");
             }
             catch (Exception e)
             {
+                e.printStackTrace();
                 //Shouldn't happen, programmatic error;
-                assert false:"Wrong URL: " + BASE_URL + link;
+
+                return new Response(e.getMessage(), ResponseCode.UNKNOWN_ERROR, null);
             }
 
-            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Response o) {
+            super.onPostExecute(o);
+
+            callCallBack(o);
         }
     }
 
-    private class PostTask extends AsyncTask<Void, Void, Response> {
+
+
+    private class PostTask extends AsyncTask<Object, Void, Response> {
         @Override
-        protected Response doInBackground(Void[] params) {
-            return null;
+        protected Response doInBackground(Object[] params) {
+            try
+            {
+                HttpClient c = new DefaultHttpClient();
+
+
+                DevLog.e(message);
+                HttpPost post = new HttpPost(BASE_URL + link);
+                post.setEntity(new StringEntity(message));
+                post.addHeader("Content-Type", "application/json");
+                HttpResponse response = c.execute(post);
+
+                String responseString = getResponse(response.getEntity().getContent());
+                Log.e("TAAG", responseString);
+                Object returnVal = new Gson().fromJson(responseString, returningClass);
+                return new Response(null, ResponseCode.OK, returnVal);// new Response(ResponseCode.OK, responseString, null);
+            }
+            catch (UnknownHostException e)
+            {
+                e.printStackTrace();
+                return new Response(null, ResponseCode.NO_NETWORK, null);//new Response(ResponseCode.UNKNOWN_HOST, null, "Unable to connect to network");
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                //Shouldn't happen, programmatic error;
+
+                return new Response(e.getMessage(), ResponseCode.UNKNOWN_ERROR, null);
+            }
+
         }
 
         @Override
@@ -97,14 +166,15 @@ public class NetworkRequest<T> {
     {
         int c;
         StringBuilder builder = new StringBuilder();
-        while ((c = stream.read()) != -1)
+        BufferedReader in = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+        while ((c = in.read()) != -1)
         {
-            builder.append(c);
+            builder.append((char)c);
         }
         return builder.toString();
     }
 
-    private void callCallBack(Response<T> result)
+    private void callCallBack(Response result)
     {
         String method = callbackMethod + (result.getReturnObject() != null ? "Success" : "Failed");
         Object obj = result.getReturnObject() != null ? result.getReturnObject() : result;

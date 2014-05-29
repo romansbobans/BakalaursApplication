@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BakalaursApplication.iml" filepath="$PROJECT_DIR$/BakalaursApplication.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../Programming/adt-bundle-mac-x86_64-20130219/sdk/extras/google/google_play_services/libproject/google-play-services_lib/google-play-services_lib.iml" filepath="$PROJECT_DIR$/../../Programming/adt-bundle-mac-x86_64-20130219/sdk/extras/google/google_play_services/libproject/google-play-services_lib/google-play-services_lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/library/library.iml" filepath="$PROJECT_DIR$/libs/library/library.iml" />
     </modules>
   </component>

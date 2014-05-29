@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">BaseActivity</string>
+    <string name="app_name">VisitSmart</string>
     <string name="drawer_open">Izvēlies kategoriju</string>
     <string name="drawer_close">Spied šeit</string>
+    <string name="language_lv">lv</string>
+    <string name="drawer_opened_text">Sadaļas</string>
+    <string name="drawer_closed_text">Izvēlne</string>
+    <string name="drawer_settings">Uzstādījumi</string>
+    <string name="drawer_help">Palīdzība</string>
+    <string name="language">Valoda</string>
+    <string name="default_lang_LV">LV</string>
+    <string name="comments_text">Komentāri</string>
+    <string name="close_text">Aizvērt</string>
+    <string name="add_comment">PIevienot komentāru...</string>
+    <string name="send_text">Sūtīt</string>
+    <string name="error_empty_comment">Lūdzu ievadiet komentāra tekstu</string>
+    <string name="comment_added_success">Komentārs veiksmīgi pievienots</string>
+    <string name="rate_text">Novērtēt</string>
+    <string name="about_us">Par mums</string>
+    <string name="drawer_about_us">Par mums</string>
+    <string name="view_map">Apskatīt kartē</string>
 </resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="gray_text_color">#a5a5a5</color>
+    <color name="gray_divider">#a5a5a5</color>
+    <color name="white">#FFFFFF</color>
+</resources>

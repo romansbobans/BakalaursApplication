@@ -4,19 +4,70 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    <!-- The main content view -->
+        android:layout_height="match_parent"
+        >
     <FrameLayout
             android:id="@+id/content_frame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    <!-- The navigation drawer -->
+            android:layout_height="match_parent"
+            />
+    <LinearLayout
+            android:layout_width="240dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_gravity="start"
+            android:background="#e5e5e5">
     <ListView android:id="@+id/left_drawer"
               android:layout_width="240dp"
-              android:layout_height="match_parent"
-              android:layout_gravity="start"
+              android:layout_height="wrap_content"
               android:choiceMode="singleChoice"
               android:divider="@android:color/transparent"
-              android:dividerHeight="0dp"
-              android:background="#111"/>
+              android:dividerHeight="0dp"/>
+
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:onClick="onSettings">
+            <ImageView
+                    android:layout_width="@dimen/drawer_list_image_size"
+                    android:layout_height="@dimen/drawer_list_image_size"
+                    android:src="@drawable/settings_gear"/>
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/drawer_settings"
+                    android:layout_gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="22sp"
+                    android:textColor="@color/gray_text_color"/>
+                </LinearLayout>
+
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:onClick="onHelp">
+            <ImageView
+                    android:layout_width="@dimen/drawer_list_image_size"
+                    android:layout_height="@dimen/drawer_list_image_size"
+                    android:src="@drawable/question_mark"/>
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/drawer_about_us"
+                    android:layout_gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="22sp"
+                    android:textColor="@color/gray_text_color"/>
+        </LinearLayout>
+
+
+
+</LinearLayout>
 </android.support.v4.widget.DrawerLayout>
