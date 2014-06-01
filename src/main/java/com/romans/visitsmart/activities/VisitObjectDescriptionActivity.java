@@ -3,10 +3,12 @@ package com.romans.visitsmart.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.gson.Gson;
 import com.romans.visitsmart.R;
@@ -29,6 +31,10 @@ public class VisitObjectDescriptionActivity extends BaseActivity {
 
     WebView descriptionView;
     RatingBar bar;
+    private TextView workingHrs;
+    private TextView groups;
+
+    private final static String GALLERY_FRAGMENT_TAG = "gallery.fragment";
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +46,12 @@ public class VisitObjectDescriptionActivity extends BaseActivity {
             String rawVisitObject = getIntent().getExtras().getString(Extras.SELECTED_VISITOBJECT);
             object = new Gson().fromJson(rawVisitObject, VisitObject.class);
         }
+        else
+        {
+
+            String rawVisitObject = savedInstanceState.getString(Extras.SELECTED_VISITOBJECT);
+            object = new Gson().fromJson(rawVisitObject, VisitObject.class);
+        }
 
         try {
             description = object.getObjectDescriptions(this);
@@ -48,16 +60,67 @@ public class VisitObjectDescriptionActivity extends BaseActivity {
         }
 
         descriptionView = (WebView) findViewById(R.id.description_fragment_holder);
+        workingHrs = (TextView) findViewById(R.id.description_working_hrs);
+        setWorkingHrs();
+        groups = (TextView) findViewById(R.id.description_groups);
+        setGroups();
         bar = (RatingBar) findViewById(R.id.object_rating_bar);
         bar.setOnRatingBarChangeListener(ratingListener);
         bar.setRating(object.getRating());
         loadDescription();
         getActionBar().setTitle(description.getName());
+
+
+        Fragment gallery = getSupportFragmentManager().findFragmentByTag(GALLERY_FRAGMENT_TAG);
+        if (gallery == null)
+        {
+            gallery = GalleryFragment.newInstance(object.getImagePairs());
+        }
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-     //   if (object.getImagePairs() != null && object.getImagePairs().length != 0) {
-            transaction.replace(R.id.descriptions_gallery_holder, GalleryFragment.newInstance(object));
-       // }
+        if (object.getImagePairs() != null && object.getImagePairs().length != 0) {
+            transaction.replace(R.id.descriptions_gallery_holder, gallery, GALLERY_FRAGMENT_TAG) ;
+        }
+        else
+        {
+         findViewById(R.id.descriptions_gallery_holder).setVisibility(View.GONE);
+        }
         transaction.commit();
+    }
+
+    private void setGroups() {
+        if (description.getGroups() != null && description.getGroups().length > 0)
+        {
+            for(VisitObject.VisitObjectDescription.ClientGroups group : description.getGroups())
+            {
+                groups.append(group.getGroupName() + "\t\t" + group.getGroupPrice() + "\n");
+            }
+        }
+        else
+        {
+            findViewById(R.id.description_groups_container).setVisibility(View.GONE);
+        }
+    }
+
+    private void setWorkingHrs()
+    {
+        if (description.getWorkingHours() != null && description.getWorkingHours().length > 0)
+        {
+            for(VisitObject.VisitObjectDescription.Hours hours : description.getWorkingHours())
+            {
+                workingHrs.append(hours.getDay() + "\t\t" + hours.getHours() + "\n");
+            }
+        }
+        else
+        {
+            findViewById(R.id.description_working_hrs_container).setVisibility(View.GONE);
+        }
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(Extras.SELECTED_VISITOBJECT, new Gson().toJson(object));
     }
 
     RatingBar.OnRatingBarChangeListener ratingListener = new RatingBar.OnRatingBarChangeListener() {
@@ -89,7 +152,9 @@ public class VisitObjectDescriptionActivity extends BaseActivity {
 
     @Override
     public void onCommentsReceivedFailed(Response response) {
-        super.onCommentsReceivedFailed(response);
+        showDefaultNetworkError(response);
+        dismissLoadingDialog();
+
     }
 
     @Override
@@ -99,19 +164,20 @@ public class VisitObjectDescriptionActivity extends BaseActivity {
 
     @Override
     public void onCommentAddedFailed(Response response) {
-        super.onCommentAddedFailed(response);
+        showDefaultNetworkError(response);
+
     }
 
     @Override
     public void onRatingPostedFailed(Response response) {
-        super.onRatingPostedFailed(response);
+        showDefaultNetworkError(response);
     }
 
     @Override
-    public void onRatingPostedSuccess(float v, int i) {
-        object.setRating(v);
-        object.setRatingCount(i);
-        bar.setRating(v);
+    public void onRatingPostedSuccess(VisitObject object) {
+        object.setRating(object.getRating());
+        object.setRatingCount(object.getRatingCount());
+        bar.setRating(object.getRating());
     }
 
     public void goToMapView(View view) {

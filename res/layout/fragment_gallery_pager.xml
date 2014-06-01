@@ -7,6 +7,7 @@
     <ImageView
             android:layout_width="100px"
             android:layout_height="match_parent"
-            android:src="@drawable/ventspils_cropped"/>
+            android:src="@drawable/ventspils_cropped"
+            android:id="@+id/visit_gallery_item_icon"/>
 
 </FrameLayout>

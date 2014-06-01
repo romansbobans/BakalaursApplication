@@ -30,7 +30,10 @@ public interface NetworkHandler {
     void onCommentAddedSuccess();
     void onCommentAddedFailed(Response response);
 
+    @Deprecated
     void onRatingPostedSuccess(float v, int i);
+
+    void onRatingPostedSuccess(VisitObject object);
     void onRatingPostedFailed(Response response);
 
 }

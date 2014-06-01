@@ -7,6 +7,7 @@ import com.romans.visitsmart.networking.handler.NetworkHandler;
 import com.romans.visitsmart.networking.traffic.Response;
 import com.romans.visitsmart.networking.traffic.ResponseCode;
 import com.romans.visitsmart.networking.traffic.Type;
+import com.romans.visitsmart.utils.AppUtils;
 import com.romans.visitsmart.utils.DevLog;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -123,6 +124,11 @@ class NetworkRequest {
     private class PostTask extends AsyncTask<Object, Void, Response> {
         @Override
         protected Response doInBackground(Object[] params) {
+
+            if (!AppUtils.isNetworkAvailable((android.content.Context) handler))
+            {
+                return new Response(null, ResponseCode.NO_NETWORK, null);
+            }
             try
             {
                 HttpClient c = new DefaultHttpClient();
@@ -135,7 +141,7 @@ class NetworkRequest {
                 HttpResponse response = c.execute(post);
 
                 String responseString = getResponse(response.getEntity().getContent());
-                Log.e("TAAG", responseString);
+                DevLog.e("Response", responseString);
                 Object returnVal = new Gson().fromJson(responseString, returningClass);
                 return new Response(null, ResponseCode.OK, returnVal);// new Response(ResponseCode.OK, responseString, null);
             }
@@ -176,12 +182,25 @@ class NetworkRequest {
 
     private void callCallBack(Response result)
     {
-        String method = callbackMethod + (result.getReturnObject() != null ? "Success" : "Failed");
-        Object obj = result.getReturnObject() != null ? result.getReturnObject() : result;
+        String method = callbackMethod + (result.isValid() ? "Success" : "Failed");
+        Object obj = result.isValid() ? result.getReturnObject() : result;
        // DevLog.d("OBJECT: " + obj.getClass());
         try {
-            Method m = handler.getClass().getDeclaredMethod(method, obj.getClass());
-            m.invoke(handler, obj);
+            DevLog.e("CALLING CALLBACK: " + method);
+
+            Method m;
+            if (obj == null)
+            {
+                m = handler.getClass().getDeclaredMethod(method);
+
+                m.invoke(handler);
+            }
+            else
+            {
+                m = handler.getClass().getDeclaredMethod(method, obj.getClass());
+
+                m.invoke(handler, obj);
+            }
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
             throw new RuntimeException("Cannot find callback:" + method + "  with parameters: " + obj.getClass().getSimpleName());

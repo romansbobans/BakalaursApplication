@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.google.gson.Gson;
 import com.romans.visitsmart.R;
 import com.romans.visitsmart.adapters.CommentsAdapter;
 import com.romans.visitsmart.dao.VisitObjectComment;
@@ -22,18 +23,23 @@ import com.romans.visitsmart.networking.handler.NetworkHandler;
  */
 public class CommentsDialogFragment extends DialogFragment {
 
-    private final NetworkHandler listener;
-    private final String objectId;
+    private static final String EXTRA_COMMENTS = "extra.comments";
+    private static final String EXTRA_OBJECT_ID = "extra.view.id";
+    private NetworkHandler listener;
+    private String objectId;
     VisitObjectComment[] object;
 
-    public CommentsDialogFragment(VisitObjectComment[] comments, NetworkHandler listener, String objectId) {
-        this.object = comments;
-        this.listener = listener;
-        this.objectId = objectId;
+    public CommentsDialogFragment() {
     }
 
     public static DialogFragment newInstance(VisitObjectComment[] comments, String objectId, NetworkHandler listener) {
-        DialogFragment fragment = new CommentsDialogFragment(comments, listener, objectId);
+        CommentsDialogFragment fragment = new CommentsDialogFragment();
+        Bundle args = new Bundle();
+        Gson gson = new Gson();
+        args.putString(EXTRA_COMMENTS, gson.toJson(comments));
+        args.putString(EXTRA_OBJECT_ID, objectId);
+        fragment.setArguments(args);
+        fragment.listener = listener;
         return fragment;
 
     }
@@ -43,6 +49,9 @@ public class CommentsDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.comments_fragment, null);
+
+        object = new Gson().fromJson(getArguments().getString(EXTRA_COMMENTS), VisitObjectComment[].class);
+        objectId = getArguments().getString(EXTRA_OBJECT_ID);
 
         ListView commentList = (ListView) view.findViewById(R.id.comment_list);
         commentList.setAdapter(new CommentsAdapter(getActivity(), object));

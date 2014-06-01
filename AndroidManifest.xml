@@ -3,6 +3,7 @@
           package="com.romans.visitsmart"
           android:versionCode="1"
           android:versionName="1.0"
+          android:installLocation="preferExternal"
         >
 
     <uses-sdk
@@ -17,6 +18,7 @@
 
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-feature
             android:glEsVersion="0x00020000"
             android:required="true"

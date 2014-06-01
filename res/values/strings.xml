@@ -20,4 +20,9 @@
     <string name="about_us">Par mums</string>
     <string name="drawer_about_us">Par mums</string>
     <string name="view_map">Apskatīt kartē</string>
+    <string name="working_hrs">Darba laiks:</string>
+    <string name="groups_text">Cenu kategorijas:</string>
+    <string name="no_ntework_message">Vai jums ir ieslēgts internets? ;)</string>
+    <string name="unknown_error">Notikusi kļūme! Pamēģiniet pēc kāda laika!</string>
+    <string name="loading">Ielādē datus... Lūdzu uzgaidiet!</string>
 </resources>

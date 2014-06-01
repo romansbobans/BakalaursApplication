@@ -4,7 +4,6 @@ import com.romans.visitsmart.dao.Category;
 import com.romans.visitsmart.dao.VisitObject;
 import com.romans.visitsmart.dao.VisitObjectComment;
 import com.romans.visitsmart.networking.handler.NetworkHandler;
-import com.romans.visitsmart.utils.DevLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -48,8 +47,7 @@ public class BaseRequest {
         JSONObject object = new JSONObject();
         try {
             object.put("text", text);
-            DevLog.e("JSON: " + object.toString());
-            NetworkRequest.createPostRequest(handler, UPLOAD_COMMENTS + "/" + objectId, object.toString(),  NetworkHandler.ON_COMMENT_ADDED, VisitObjectComment[].class).execute();
+            NetworkRequest.createPostRequest(handler, UPLOAD_COMMENTS + "/" + objectId, object.toString(),  NetworkHandler.ON_COMMENT_ADDED, Void.class).execute();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -58,7 +56,6 @@ public class BaseRequest {
     }
 
     public void postRating(String id, float rating) {
-
-        handler.onRatingPostedSuccess(4.0f, 17);
+        NetworkRequest.createPostRequest(handler, UPLOAD_COMMENTS + "/" + id, rating + "",  NetworkHandler.ON_RATING_POSTED, VisitObject.class).execute();
     }
 }

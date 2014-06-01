@@ -15,6 +15,19 @@ public class Response<T> {
         this.object = object;
     }
 
+    public ResponseCode getCode() {
+        return code;
+    }
+
+    public boolean isValid()
+    {
+        return code == ResponseCode.OK;
+    }
+
+    public void setCode(ResponseCode code) {
+        this.code = code;
+    }
+
     public T getReturnObject() {
         return object;
     }

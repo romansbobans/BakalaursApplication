@@ -1,6 +1,7 @@
 package com.romans.visitsmart.activities;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import com.google.gson.Gson;
 import com.romans.visitsmart.R;
@@ -15,6 +16,7 @@ public class ObjectViewActivity extends BaseActivity{
 
 
     Category selectedCategory;
+    private String FRAGMENT_TAG = "objects.fragment";
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,22 +24,38 @@ public class ObjectViewActivity extends BaseActivity{
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+        String selectedCategoryRaw;
         if (savedInstanceState == null)
         {
-            String selectedCategoryRaw = getIntent().getExtras().getString(Extras.SELECTED_CATEGORY);
-            selectedCategory = new Gson().fromJson(selectedCategoryRaw, Category.class);
+            selectedCategoryRaw = getIntent().getExtras().getString(Extras.SELECTED_CATEGORY);
+            selectedCategory = gson.fromJson(selectedCategoryRaw, Category.class);
         }
-//        getActionBar().setTitle(selectedCategory.get);
+        else
+        {
+            selectedCategoryRaw = savedInstanceState.getString(Extras.SELECTED_CATEGORY);
+            selectedCategory = gson.fromJson(selectedCategoryRaw, Category.class);
 
+        }
+
+        if (fragment == null)
+        {
+            fragment = ObjectViewListFragment.newInstance(selectedCategory);
+        }
+        else
+        {
+            fragment.getArguments().putString(Extras.SELECTED_CATEGORY, selectedCategoryRaw);
+        }
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.object_view_content_holder, ObjectViewListFragment.newInstance(selectedCategory));
+        transaction.replace(R.id.object_view_content_holder, fragment, FRAGMENT_TAG);
         transaction.commit();
-
-
-
 
     }
 
-
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(Extras.SELECTED_CATEGORY, new Gson().toJson(selectedCategory));
+        super.onSaveInstanceState(outState);
+    }
 }
 

@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.widget.ImageView;
+import com.romans.visitsmart.R;
+import com.romans.visitsmart.utils.DevLog;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -31,12 +33,20 @@ public class ImageWorker extends AsyncTask<String, Void, Bitmap>{
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
-        view.setImageBitmap(bitmap);
+        if (bitmap != null)
+        {
+            view.setImageBitmap(bitmap);
+        }
+        else
+        {
+            view.setImageResource(R.drawable.image_not_found);
+        }
     }
 
     public ImageWorker(Context context, ImageView view){
         fileCache=new FileCache(context);
         this.view = view;
+        this.view.setImageResource(R.drawable.ab_progress);
     }
 
 
@@ -48,7 +58,10 @@ public class ImageWorker extends AsyncTask<String, Void, Bitmap>{
 
         Bitmap b = decodeFile(f);
         if(b!=null)
+        {
+            DevLog.e("GETTING FILE");
             return b;
+        }
 
         try {
             Bitmap bitmap=null;

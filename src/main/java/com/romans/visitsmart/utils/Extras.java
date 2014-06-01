@@ -10,4 +10,5 @@ public class Extras {
     public static final String SELECTED_VISITOBJECT = "extra.selected.visit.object";
     public static final String LAT = "extra.locations.lat";
     public static final String LNG = "extra.locations.lng";
+    public static final String SELECTED_OBJECTS_ARRAY = "extra.seected.objects";
 }

@@ -2,6 +2,8 @@ package com.romans.visitsmart.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.DisplayMetrics;
 import com.romans.visitsmart.R;
 
@@ -19,5 +21,12 @@ public class AppUtils {
         android.content.res.Configuration conf = res.getConfiguration();
         conf.locale = new Locale(language.toLowerCase());
         res.updateConfiguration(conf, dm);
+    }
+
+
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null;
     }
 }

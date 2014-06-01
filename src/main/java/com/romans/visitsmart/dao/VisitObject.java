@@ -10,7 +10,7 @@ import com.romans.visitsmart.utils.Prefs;
 /**
  * Created by Romans on 05/05/14.
  */
-public class VisitObject implements Measurable{
+public class VisitObject implements Measurable {
 
     private String id;
     private String categoryId;
@@ -18,16 +18,21 @@ public class VisitObject implements Measurable{
     private ImagePair[] imagePairs;
     @SerializedName("objects")
     private VisitObjectDescription[] objectDescriptions;
-  //  private Coordinates coordinates;
-  @SerializedName("location")
-  private LatLng coordinates;
+    private LatLng coordinates;
+    private Coordinate location;
 
     private float rating;
     private int ratingCount;
 
-    private transient String distance;
+    private String distance;
 
-    SharedPreferences prefs;
+    public class Coordinate {
+        private double lat;
+        private double lng;
+    }
+
+
+    private transient SharedPreferences prefs;
 
     @Override
     public void setDistance(String distance) {
@@ -36,6 +41,9 @@ public class VisitObject implements Measurable{
 
     @Override
     public LatLng getPosition() {
+        if (coordinates == null) {
+            coordinates = new LatLng(location.lat, location.lng);
+        }
         return coordinates;
     }
 
@@ -61,18 +69,15 @@ public class VisitObject implements Measurable{
 
     public boolean hasLangSuport(String language) {
 
-        for (VisitObjectDescription description : objectDescriptions)
-        {
-            if (description.getLang().equalsIgnoreCase(language))
-            {
+        for (VisitObjectDescription description : objectDescriptions) {
+            if (description.getLang().equalsIgnoreCase(language)) {
                 return true;
             }
         }
         return false;
     }
 
-    public class ImagePair
-    {
+    public class ImagePair {
         private String thumbUrl;
 
         private String imageUrl;
@@ -95,8 +100,7 @@ public class VisitObject implements Measurable{
 
     }
 
-    public class VisitObjectDescription
-    {
+    public class VisitObjectDescription {
 
         private String shortDescription;
         private String description;
@@ -152,7 +156,6 @@ public class VisitObject implements Measurable{
         public void setGroups(ClientGroups[] groups) {
             this.groups = groups;
         }
-
 
 
         public class Hours {
@@ -235,25 +238,21 @@ public class VisitObject implements Measurable{
     public VisitObjectDescription[] getObjectDescriptions() {
         return objectDescriptions;
     }
+
     public VisitObjectDescription getObjectDescriptions(Context ctx) throws LanguageNotFoundException {
         prefs = ctx.getSharedPreferences(ctx.getPackageName(), Context.MODE_PRIVATE);
-        for (VisitObjectDescription descr : objectDescriptions)
-        {
-            if (descr.getLang().equals(prefs.getString(Prefs.LANGUAGE, "lv")));
-                return descr;
+        for (VisitObjectDescription descr : objectDescriptions) {
+            if (descr.getLang().equals(prefs.getString(Prefs.LANGUAGE, "lv"))) ;
+            return descr;
         }
         throw new LanguageNotFoundException();
     }
 
-    public void setObjectDescriptions(VisitObjectDescription[] objectDescriptions) {
-        this.objectDescriptions = objectDescriptions;
-    }
-
     public LatLng getCoordinates() {
+        if (coordinates == null) {
+            coordinates = new LatLng(location.lat, location.lng);
+        }
         return coordinates;
     }
 
-    public void setCoordinates(LatLng coordinates) {
-        this.coordinates = coordinates;
-    }
 }

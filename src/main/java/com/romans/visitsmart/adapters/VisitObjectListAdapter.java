@@ -29,6 +29,22 @@ public class VisitObjectListAdapter extends ArrayAdapter<VisitObject> {
             {
                 objects.add(o);
             }
+
+        }
+
+    }
+
+    public VisitObjectListAdapter(Context context, VisitObject[] visitObjects) {
+        super(context, android.R.layout.simple_list_item_1);
+        objects = new ArrayList<>();
+        String language = new AppPreferences(context).getString(Prefs.LANGUAGE, "LV");
+        for (VisitObject o : visitObjects)
+        {
+            if (o.hasLangSuport(language))
+            {
+                objects.add(o);
+            }
+
         }
 
     }

@@ -68,15 +68,15 @@ public class WelcomeActivity extends BaseActivity implements SettingsFragment.On
             }
             onCategoriesReceivedSuccess(this.categories);
         }
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
+    //Renew list every time it comes from background
         new BaseRequest(this).getAllCategories();
     }
+
 
     @Override
     public void onBackPressed() {
@@ -97,7 +97,7 @@ public class WelcomeActivity extends BaseActivity implements SettingsFragment.On
         {
             return;
         }
-       String[] cat = new String[categories.length];
+        String[] cat = new String[categories.length];
         Gson gson = new Gson();
 
         for (int i = 0; i < categories.length; i++)
@@ -192,6 +192,9 @@ public class WelcomeActivity extends BaseActivity implements SettingsFragment.On
 
     @Override
     public void onCategoriesReceivedFailed(Response response) {
+
+        dismissLoadingDialog();
+        showDefaultNetworkError(response);
 
     }
 
